@@ -1,85 +1,68 @@
 // components/NewsReaderHome.js
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import Header from './Header'; // Import the Header component
 import Footer from './Footer'; // Import the Footer component
 import NewsCard from './NewsCard';
+import { fetchNewsData, fetchNewsDataCategory, fetchNewsDataCountry, fetchNewsDataSearch } from '../services/newsAPIService';
 
 function NewsReaderHome() {
-  const [news, setNews] = useState([{
-    title: "UN Calls for Urgent Ceasefire as Middle East Tensions Rise",
-    url: "",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud ",
-    imageURL: "https://townsquare.media/site/942/files/2024/10/attachment-s-22.jpg?format=natural",
-    publishedAt: "2024-10-04 19:44:43",
-    source: "Defenseworld Net",
-  }, {
-    title: "UN Calls for Urgent Ceasefire as Middle East Tensions Rise",
-    url: "",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud ",
-    imageURL: "https://i0.wp.com/www.middleeastmonitor.com/wp-content/uploads/2023/10/AA-20231010-32360303-32360302-ISRAELI_AIRSTRIKES_CONTINUE_ON_GAZA.jpg?fit=1200%2C800&ssl=1",
-    publishedAt: "2024-10-04 19:44:43",
-    source: "Defenseworld Net",
-  }, {
-    title: "UN Calls for Urgent Ceasefire as Middle East Tensions Rise",
-    url: "",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud ",
-    imageURL: "https://i0.wp.com/www.middleeastmonitor.com/wp-content/uploads/2023/10/AA-20231010-32360303-32360302-ISRAELI_AIRSTRIKES_CONTINUE_ON_GAZA.jpg?fit=1200%2C800&ssl=1",
-    publishedAt: "2024-10-04 19:44:43",
-    source: "Defenseworld Net",
-  }, {
-    title: "UN Calls for Urgent Ceasefire as Middle East Tensions Rise",
-    url: "",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud ",
-    imageURL: "https://i0.wp.com/www.middleeastmonitor.com/wp-content/uploads/2023/10/AA-20231010-32360303-32360302-ISRAELI_AIRSTRIKES_CONTINUE_ON_GAZA.jpg?fit=1200%2C800&ssl=1",
-    publishedAt: "2024-10-04 19:44:43",
-    source: "Defenseworld Net",
-  }, {
-    title: "UN Calls for Urgent Ceasefire as Middle East Tensions Rise",
-    url: "",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud ",
-    imageURL: "https://i0.wp.com/www.middleeastmonitor.com/wp-content/uploads/2023/10/AA-20231010-32360303-32360302-ISRAELI_AIRSTRIKES_CONTINUE_ON_GAZA.jpg?fit=1200%2C800&ssl=1",
-    publishedAt: "2024-10-04 19:44:43",
-    source: "Defenseworld Net",
-  }, {
-    title: "UN Calls for Urgent Ceasefire as Middle East Tensions Rise",
-    url: "",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud ",
-    imageURL: "https://i0.wp.com/www.middleeastmonitor.com/wp-content/uploads/2023/10/AA-20231010-32360303-32360302-ISRAELI_AIRSTRIKES_CONTINUE_ON_GAZA.jpg?fit=1200%2C800&ssl=1",
-    publishedAt: "2024-10-04 19:44:43",
-    source: "Defenseworld Net",
-  }, {
-    title: "UN Calls for Urgent Ceasefire as Middle East Tensions Rise",
-    url: "",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud ",
-    imageURL: "https://i0.wp.com/www.middleeastmonitor.com/wp-content/uploads/2023/10/AA-20231010-32360303-32360302-ISRAELI_AIRSTRIKES_CONTINUE_ON_GAZA.jpg?fit=1200%2C800&ssl=1",
-    publishedAt: "2024-10-04 19:44:43",
-    source: "Defenseworld Net",
-  }]);
+  const [news, setNews] = useState([])
   const [category, setCategory] = useState('');
+  const [country, setCountry] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchNews();
-  }, [category]);
+    const loadNews = async () => {
+      setLoading(true); setSearchQuery
+      setError(null);
 
-  const fetchNews = async (searchQuery = '') => {
-    try {
-      const response = await axios.get(`https://newsdata.io/api/1/latest?apikey=pub_5533188998eb573b65585fb63581120da41e4&q=pizza`, {
-        params: {
-          country: 'us', // You can replace with targeted country
-          category: category || '',
-          q: searchQuery || '',
-          apiKey: 'your_news_api_key', // Replace with your NewsAPI key
-        },
-      });
-      setNews(response.data.articles);
-    } catch (error) {
-      console.error('Error fetching the news:', error);
-    }
+      try {
+        let newsData;
+
+        if (category) {
+          newsData = await fetchNewsDataCategory(category);  // Fetch news based on category
+        } else if (country) {
+          newsData = await fetchNewsDataCountry(country);  // Fetch news based on country
+        }
+        else if (searchQuery) {
+          newsData = await fetchNewsDataSearch(searchQuery);  // Fetch news based on country
+        }
+        else {
+          newsData = await fetchNewsData();  // Default news fetch
+        }
+
+        setNews(newsData);
+      } catch (error) {
+        setError('Failed to load news');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNews();
+  }, [category, country, searchQuery]);  // Watch for changes in category and country
+
+  // Handle search input change
+  const handleSearch = (searchQuery) => {
+    setSearchQuery(searchQuery);
+    setCountry('');
+    setCategory('');
   };
 
-  const handleSearch = (searchQuery) => {
-    fetchNews(searchQuery);
+  // Handle category change
+  const handleCategoryChange = (event) => {
+    setCategory(event.target.value);
+    setCountry('');  // Reset country when category is selected
+    searchQuery('');
+  };
+
+  // Handle country change
+  const handleCountryChange = (event) => {
+    setCountry(event.target.value);
+    setCategory('');  // Reset category when country is selected
+    setSearchQuery('');
   };
 
   return (
@@ -89,22 +72,31 @@ function NewsReaderHome() {
 
       {/* Categories Section */}
       <div className="categories flex justify-center">
-        <select className='bg-transparent font-bold text-lg'>
+        <select value={category} onChange={handleCategoryChange} className='bg-transparent font-bold text-lg'>
           <option className='font-bold'>All News</option>
+          <option className='font-bold' value='business'>Business</option>
+          <option className='font-bold' value='crime'>Crime</option>
+          <option className='font-bold' value='entertainment'>Entertainment</option>
+          <option className='font-bold' value='science'>Science</option>
+          <option className='font-bold' value='sport'>Sports</option>
+          <option className='font-bold' value='technology'>Technology</option>
         </select>
       </div>
-      <select className='bg-transparent font-bold text-sm mb-12'>
-        <option className='font-bold'>Sources</option>
+      <select value={country} onChange={handleCountryChange} className='bg-transparent font-bold text-sm mb-12'>
+        <option className='font-bold'>Country</option>
+        <option className='font-bold' value='us'>United states of america</option>
+        <option className='font-bold' value='gb'>United kingdom</option>
+        <option className='font-bold' value='et'>Ethiopia</option>
       </select>
       {/* News Content Section */}
       <main className="news-list grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-        {news.length > 0 ? (
+        {!loading ? (news.length > 0 ? (
           news.map((article, index) => (
-            <NewsCard key={index}  article={article} />
+            <NewsCard key={index} article={article} />
           ))
         ) : (
           <p className="text-center col-span-3">No news articles found.</p>
-        )}
+        )) : <p className="text-center col-span-3">Loading...</p>}
       </main>
 
       {/*Footer Component */}
