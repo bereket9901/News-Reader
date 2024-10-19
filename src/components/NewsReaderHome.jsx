@@ -66,7 +66,7 @@ function NewsReaderHome() {
   };
 
   return (
-    <div className="news-reader-home container mx-auto p-4">
+    <div className="news-reader-home container mx-auto p-4 px-24">
       {/*Header Component */}
       <Header onSearch={handleSearch} />
 

@@ -27,7 +27,7 @@ export default function NewsReaderDetail() {
     navigate(-1);  // Go back to the previous page
   };
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 px-24">
       <Header onSearch={() => { }} />
       <button onClick={handleBackClick} className="back-button">
         <AiOutlineArrowLeft size={24}/>
