@@ -38,3 +38,13 @@ export const fetchNewsDataCountry =async (country) => {
         throw new Error('Failed to fetch news data');
     }
 }
+
+export const fetchNewsDataCategoryThree =async (category) => {
+    try {
+        const response = await axios.get(`${News_API_URL}/latest?apikey=pub_5533188998eb573b65585fb63581120da41e4&language=en&category=${category}&size=3`);
+        return response.data.results;
+    }
+    catch {
+        throw new Error('Failed to fetch news data');
+    }
+}

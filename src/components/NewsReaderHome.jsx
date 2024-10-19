@@ -92,7 +92,7 @@ function NewsReaderHome() {
       <main className="news-list grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
         {!loading ? (news.length > 0 ? (
           news.map((article, index) => (
-            <NewsCard key={index} article={article} />
+            <NewsCard  key={index} article={article} />
           ))
         ) : (
           <p className="text-center col-span-3">No news articles found.</p>
